@@ -126,6 +126,8 @@ for i in range(page_num):
     weibos = []
     for weibo_div in weibo_divs:
         one_weibo = parse_one_weibo(weibo_div)
+        one_weibo["page"] = i+1
+        one_weibo["userID"] = user_name
         weibos.append(one_weibo)
 #         #设置随机休眠时间
 
