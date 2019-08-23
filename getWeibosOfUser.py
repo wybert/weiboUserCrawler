@@ -5,15 +5,18 @@ import urllib2
 import time
 # from lxml import etree
 from bs4 import BeautifulSoup
+# from BeautifulSoup import *
+
+
 SLEEP_FLAG = 1
-SLEEP_INTERVAL = 30
+SLEEP_INTERVAL = 40
 import pandas as pd
 import random
 
 
 HEADERS = {'User-Agent': '''Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/76.0.3809.100 Chrome/76.0.3809.100 Safari/537.36''',
            'Host': 'weibo.cn',
-           "cookie": r'''_T_WM=8c43747cae5b063e1534ee86277a6c02; ALF=1569072160; SCF=AkCVman8hkFsJhzV0gu6LcTc6bbP0OT-495b7-fe84otRY2H2h23z2XNCFb4RFnhWvHt9nW6ZXGIoeXeoooQ058.; SUB=_2A25wWudyDeRhGeBN6VYT9CvFzTyIHXVTpIk6rDV6PUNbktBeLXP9kW1NRJrTH2VP8FBAdV924w1XIYLj3KEmvPhy; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9W5sOEfKX.m6y77jN34pRfbj5JpX5KzhUgL.Foq0eoBESh-4So52dJLoIpySqPL.qP.LxK-LBKBLBKMLxKnLBo2LBK2t; SUHB=0TPFT12oshoIox; SSOLoginState=1566480162'''}
+           "cookie": r'''ALF=1569123756; SCF=AisR_kkQv3XsOSavJe9Ka-f3Yik-iI-Q3C6W6ZvA_wm1XlpHu1r3MZoMzzwwTRwqlF-ZMcsCD3owxUfqj1T_OqY.; SUB=_2A25wWxD9DeRhGeNM7lsQ-C_Mzz6IHXVTp7C1rDV6PUNbktANLVPekW1NSaQIXJY1HDMWDLq02p1G4SpQD2aNCof7; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WWpJJ1.W2X37czZpe-3o6sg5JpX5KMhUgL.Fo-ESK.p1h27Shz2dJLoIEXLxK-LBo5L12qLxKMLB.-L12-LxKBLBonL12-LxK-LBo5L12qLxKqLB-qL1h-t; SUHB=0bt8Tmfe6BvQfw; SSOLoginState=1566531757; _T_WM=0b6efda74b267a92c885f60fd7fe72f7'''}
 
 # proxy = {'http': '127.0.0.1:1080'}
 # proxy_support = urllib2.ProxyHandler(proxy)
@@ -75,6 +78,7 @@ def parse_one_weibo(weibo_div):
 def parse_page_num(soup):
 
     page_num_div = soup.findAll("div", {"class": "pa"})[0]
+    # print page_num_div
     page_num = int(page_num_div.find("input", {"name": "mp"})["value"])
     return page_num
 
@@ -82,7 +86,8 @@ def parse_page_num(soup):
 
 def get_page_num(user_name):
 
-    url = "https://weibo.cn/%s?filter=1&page=%d" % (user_name, 1)
+    url = "https://weibo.cn/%s/profile?hasori=1&haspic=0&starttime=20160101&endtime=20190101&advancedfilter=1&page=%d" % (user_name, 2)
+    # print url
     html = Parseurl(url)
     soup = BeautifulSoup(html, "lxml")
     page_num = parse_page_num(soup)
@@ -94,15 +99,12 @@ def get_page_num(user_name):
 
 # -------------------------------------------------------------------------------------------
 
-
-
-
-user_name = "uktimes"
+user_name = "2803301701"
 
 page_num = get_page_num(user_name)
 
-
-## start page from  here....
+print page_num
+# start page from  here....
 
 start = 1
 
@@ -113,7 +115,9 @@ for i in range(page_num):
     print "page ", i+1, "/", page_num
 
 
-    url = "https://weibo.cn/%s?filter=1&page=%d" % (user_name, i+1)
+    url = "https://weibo.cn/%s/profile?hasori=1&haspic=0&starttime=20160101&endtime=20190101&advancedfilter=1&page=%d" % (user_name, i+1)
+    
+    print url
     html = Parseurl(url)
     soup = BeautifulSoup(html, "lxml")
     ## one page weibos
@@ -135,10 +139,5 @@ for i in range(page_num):
     sleeptime_one = random.randint(SLEEP_INTERVAL-10, SLEEP_INTERVAL + 10)
     time.sleep(sleeptime_one)
 
-
-# weibo_divs = soup.findAll("div", {"class": "c"})[1:-2]
-
-# for weibo_div in weibo_divs:
-#     one_weibo = parse_one_weibo(weibo_div)
 
 
