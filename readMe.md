@@ -24,11 +24,21 @@ conda install numpy pandas
 
     点击每个资源项目，找到`cookie`，将其复制到代码对应的位置  
 
+<<<<<<< HEAD
 
 
 - 找到用户的`ID`，也就是用户主页的url后面的那部分，将其复制到代码对应的位置
 
 
+=======
+![](https://github.com/wybert/weiboUserCrawler/blob/master/Peek%202019-08-23%2010-30.gif)
+
+![](https://github.com/wybert/weiboUserCrawler/blob/master/Peek%202019-08-23%2010-32.gif)
+
+- 找到用户的`ID`，也就是用户主页的url后面的那部分，将其复制到代码对应的位置
+
+![](https://github.com/wybert/weiboUserCrawler/blob/master/Peek%202019-08-23%2010-33.gif)
+>>>>>>> b6cbf1aa258dad376b588df3f376ff5389f98763
 
 4. 运行程序
   
