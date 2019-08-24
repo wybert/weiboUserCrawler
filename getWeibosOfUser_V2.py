@@ -99,72 +99,76 @@ def get_page_num(url):
 
 
 
-def save_Allweibo_pages_url(user_name,startTime,endTime):
-
-    j=0
-
-    start = 0
-    while startTime < endTime:
-
-        if j < start:
-            continue
-        # print startTime
-        stratTime_str = ''.join(startTime.isoformat().split("-"))
-        startTime += relativedelta(months=+1)
-        endTime_str = ''.join(startTime.isoformat().split("-"))
-
-
-        url = "https://weibo.cn/%s/profile?hasori=1&haspic=0&starttime=%s&endtime=%s&advancedfilter=1&page=%d" % (user_name,stratTime_str,endTime_str, 1)
-        print j
-        print url
-        page_num = get_page_num(url)
-
-        if page_num >120:
-            print "#_#","pages more than 120"
-        print stratTime_str, endTime_str, page_num,"pages"
-
-        URL_list = []
-
-        for i in range(page_num):
-        # start page from  here....
-            temp = {}
-            url = "https://weibo.cn/%s/profile?hasori=1&haspic=0&starttime=%s&endtime=%s&advancedfilter=1&page=%d" % (user_name,stratTime_str,endTime_str, i+1)
-
-            temp['url'] = url
-            temp['page_num'] = page_num
-            temp['startTime'] = stratTime_str
-
-            URL_list.append(temp)
-
-        df = pd.DataFrame(URL_list)
-
-        if j == 0:
-            df.to_csv(user_name + '_weibosURL.csv', mode='a', encoding="utf-8")
-        else:
-            df.to_csv(user_name + '_weibosURL.csv', mode='a', header=False, encoding="utf-8")
-
-        j+=1
-
-
 # -------------------------------------------------------------------------------------------
 
 
 user_name = "2803301701"
 
+## 设置开始时间
 startTime = datetime.date(2016,1,1)
 endTime = datetime.date(2019,1,1)
 
-print "*"*30
-print "saving the urls of weibos..."
-# save_Allweibo_pages_url(user_name,startTime,endTime)
-
-url_list = pd.read_csv(user_name + '_weibosURL.csv')
-
-print "*"*30
-print 'saving the weibos...'
-
+j=0
 
 start = 0
+while startTime < endTime:
+
+    if j < start:
+        continue
+    # print startTime
+    stratTime_str = ''.join(startTime.isoformat().split("-"))
+    startTime += relativedelta(months=+1)
+    endTime_str = ''.join(startTime.isoformat().split("-"))
+
+
+    url = "https://weibo.cn/%s/profile?hasori=1&haspic=0&starttime=%s&endtime=%s&advancedfilter=1&page=%d" % (user_name,stratTime_str,endTime_str, 1)
+    # print j
+    # print url
+    page_num = get_page_num(url)
+
+    if page_num >120:
+        print "#_#","pages more than 120"
+    print stratTime_str, endTime_str, page_num,"pages"
+
+
+## 设置开始的页面数
+    start = 1
+
+    for i in range(page_num):
+    # start page from  here....
+
+        if i+1 < start:
+            continue
+
+        # temp = {}
+        url = "https://weibo.cn/%s/profile?hasori=1&haspic=0&starttime=%s&endtime=%s&advancedfilter=1&page=%d" % (user_name,stratTime_str,endTime_str, i+1)
+
+        print url
+        html = Parseurl(url)
+        soup = BeautifulSoup(html, "lxml")
+        ## one page weibos
+        weibo_divs = soup.findAll("div", {"class": "c"})[1:-2]
+
+        weibos = []
+        for weibo_div in weibo_divs:
+            one_weibo = parse_one_weibo(weibo_div)
+            one_weibo["url_id"] = i
+            one_weibo["userID"] = user_name
+            weibos.append(one_weibo)
+    #         #设置随机休眠时间
+
+        df = pd.DataFrame(weibos)
+
+        if i == 0:
+            df.to_csv(user_name + '_weibos.csv', mode='a', encoding="utf-8")
+        else:
+            df.to_csv(user_name + '_weibos.csv', mode='a', header=False, encoding="utf-8")
+
+        sleeptime_one = random.randint(SLEEP_INTERVAL-10, SLEEP_INTERVAL + 10)
+        time.sleep(sleeptime_one)  
+
+
+
 
 for i,item in url_list.iterrows():
 
@@ -177,29 +181,7 @@ for i,item in url_list.iterrows():
 
     url = item["url"]
     
-    print url
-    html = Parseurl(url)
-    soup = BeautifulSoup(html, "lxml")
-    ## one page weibos
-    weibo_divs = soup.findAll("div", {"class": "c"})[1:-2]
 
-    weibos = []
-    for weibo_div in weibo_divs:
-        one_weibo = parse_one_weibo(weibo_div)
-        one_weibo["url_id"] = i
-        one_weibo["userID"] = user_name
-        weibos.append(one_weibo)
-#         #设置随机休眠时间
-
-    df = pd.DataFrame(weibos)
-
-    if i == 0:
-        df.to_csv(user_name + '_weibos.csv', mode='a', encoding="utf-8")
-    else:
-        df.to_csv(user_name + '_weibos.csv', mode='a', header=False, encoding="utf-8")
-
-    sleeptime_one = random.randint(SLEEP_INTERVAL-10, SLEEP_INTERVAL + 10)
-    time.sleep(sleeptime_one)
 
 
 
