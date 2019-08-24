@@ -85,9 +85,12 @@ def parse_page_num(soup):
 
 # print one_weibo
 
-def get_page_num(url):
+def get_page_num(user_name,stratTime_str,endTime_str):
 
-    # print url
+
+    url = "https://weibo.cn/%s/profile?hasori=1&haspic=0&starttime=%s&endtime=%s&advancedfilter=1&page=%d" % (user_name,stratTime_str,endTime_str, 1)
+
+    print url
     html = Parseurl(url)
     soup = BeautifulSoup(html, "lxml")
     page_num = parse_page_num(soup)
@@ -97,31 +100,7 @@ def get_page_num(url):
 
     return page_num
 
-
-
-def save_Allweibo_pages_url(user_name,startTime,endTime):
-
-    j=0
-
-    start = 0
-    while startTime < endTime:
-
-        if j < start:
-            continue
-        # print startTime
-        stratTime_str = ''.join(startTime.isoformat().split("-"))
-        startTime += relativedelta(months=+1)
-        endTime_str = ''.join(startTime.isoformat().split("-"))
-
-
-        url = "https://weibo.cn/%s/profile?hasori=1&haspic=0&starttime=%s&endtime=%s&advancedfilter=1&page=%d" % (user_name,stratTime_str,endTime_str, 1)
-        print j
-        print url
-        page_num = get_page_num(url)
-
-        if page_num >120:
-            print "#_#","pages more than 120"
-        print stratTime_str, endTime_str, page_num,"pages"
+def construt_url_from_page_num(page_num,user_name,stratTime_str,endTime_str):
 
         URL_list = []
 
@@ -135,15 +114,77 @@ def save_Allweibo_pages_url(user_name,startTime,endTime):
             temp['startTime'] = stratTime_str
 
             URL_list.append(temp)
-
         df = pd.DataFrame(URL_list)
+        return df
 
-        if j == 0:
-            df.to_csv(user_name + '_weibosURL.csv', mode='a', encoding="utf-8")
+
+def save_weibosData(j,user_name,df):
+
+    if j == 0:
+        df.to_csv(user_name + '_weibosURL.csv', mode='a', encoding="utf-8")
+    else:
+        df.to_csv(user_name + '_weibosURL.csv', mode='a', header=False, encoding="utf-8")
+
+
+def save_Allweibo_pages_url(user_name,startTime,endTime,timedelta):
+
+    j=1
+
+    start = 0
+    while startTime < endTime:
+
+        if j < start:
+            continue
+        # print startTime
+
+        interd_1 = startTime + datetime.timedelta(days = 10)
+        interd_1_str = ''.join(interd_1.isoformat().split("-"))
+        interd_2 = startTime + datetime.timedelta(days = 20)
+        interd_2_str = ''.join(interd_2.isoformat().split("-"))
+
+
+        stratTime_str = ''.join(startTime.isoformat().split("-"))
+        startTime += timedelta
+        endTime_str = ''.join(startTime.isoformat().split("-"))
+
+
+        # url = "https://weibo.cn/%s/profile?hasori=1&haspic=0&starttime=%s&endtime=%s&advancedfilter=1&page=%d" % (user_name,stratTime_str,endTime_str, 1)
+        print j
+        # print url
+        page_num = get_page_num(user_name,stratTime_str,endTime_str)
+
+        if page_num >120:
+
+            print "#_#","pages more than 120"
+
+
+            page_num = get_page_num(user_name,stratTime_str,interd_1_str)
+            df = construt_url_from_page_num(page_num,user_name,stratTime_str,interd_1_str)
+            save_weibosData(j,user_name,df)
+
+            j += 1
+            page_num = get_page_num(user_name,interd_1_str,interd_2_str)
+            print page_num
+            df = construt_url_from_page_num(page_num,user_name,interd_1_str,interd_2_str)
+            save_weibosData(j,user_name,df)
+
+            j += 1
+            page_num = get_page_num(user_name,interd_2_str,endTime_str)
+            df = construt_url_from_page_num(page_num,user_name,interd_2_str,endTime_str)
+            save_weibosData(j,user_name,df)
+            j += 1
         else:
-            df.to_csv(user_name + '_weibosURL.csv', mode='a', header=False, encoding="utf-8")
 
-        j+=1
+
+            # while startTime - timedelta :
+            #     pass
+
+            print stratTime_str, endTime_str, page_num,"pages"
+            df = construt_url_from_page_num(page_num,user_name,stratTime_str,endTime_str)
+            save_weibosData(j,user_name,df)
+
+
+            j+=1
 
 
 # -------------------------------------------------------------------------------------------
@@ -151,12 +192,13 @@ def save_Allweibo_pages_url(user_name,startTime,endTime):
 
 user_name = "2803301701"
 
-startTime = datetime.date(2016,1,1)
-endTime = datetime.date(2019,1,1)
-
+startTime = datetime.date(2018,3,1)
+endTime = datetime.date(2018,4,1)
+timedelta = relativedelta(months=+1)
 print "*"*30
 print "saving the urls of weibos..."
-# save_Allweibo_pages_url(user_name,startTime,endTime)
+
+# save_Allweibo_pages_url(user_name,startTime,endTime,timedelta)
 
 url_list = pd.read_csv(user_name + '_weibosURL.csv')
 
