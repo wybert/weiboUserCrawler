@@ -108,13 +108,13 @@ user_name = "2803301701"
 startTime = datetime.date(2016,1,1)
 endTime = datetime.date(2019,1,1)
 
-j=0
+# j=0
 
-start = 0
+# start = 0
 while startTime < endTime:
 
-    if j < start:
-        continue
+    # if j < start:
+    #     continue
     # print startTime
     stratTime_str = ''.join(startTime.isoformat().split("-"))
     startTime += relativedelta(months=+1)
@@ -170,16 +170,16 @@ while startTime < endTime:
 
 
 
-for i,item in url_list.iterrows():
+# for i,item in url_list.iterrows():
 
-    if i < start:
-        continue
+#     if i < start:
+#         continue
 
-    print datetime.datetime.now(),i
-    # print "page ", i+1, "/", page_num
+#     print datetime.datetime.now(),i
+#     # print "page ", i+1, "/", page_num
 
 
-    url = item["url"]
+#     url = item["url"]
     
 
 
